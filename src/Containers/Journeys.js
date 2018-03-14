@@ -16,16 +16,14 @@ class Journeys extends Component {
     }
 
     render () {
-        // var Comp = <FirstChoices onTap={this.onTap} />;
-        // if (this.state.which === 'journey') {
-        //     Comp = <JourneyManager path={'something'}/>
-        // }
+
         var onTap = this.onTap;
         if ( this.state.which === 'journey' ) {
             return <JourneyManager path={'something'} style={{ flex: 1 }} />
         } else {
             return <FirstChoices onTap={onTap} style={{ flex: 1 }} />
         }
+
     }
 };  // End <Journeys>
 
