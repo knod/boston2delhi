@@ -6,6 +6,8 @@ import { Button, View } from 'react-native';
 
 // OURS
 import { JourneyManager } from './JourneyManager';
+import { Camera } from '../Components/Camera';
+
 
 class Journeys extends Component {
     state = {which: 'choices'}
