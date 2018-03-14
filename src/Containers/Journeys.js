@@ -45,32 +45,6 @@ const FirstChoices = function ({ onTap }) {
 };  // End <FirstChoices>
 
 
-
-
-// const FirstChoices extends Component () {
-//     state = {webComponent: <View></View>}
-
-//     onTap = (evnt) => {
-//         this.setState({webComponent: <JourneyManager path={evnt}/>})
-//     }
-
-//     render () {
-
-//     var comp = this.state.webComponent;
-
-//     return (<View className={'opening-choice'} centered size={'mini'}>
-//         {comp}
-//         <Button title={'1'} onPress={this.onTap} />
-//         <Button title={'2'} onPress={this.onTap} />
-//         <Button title={'3'} onPress={this.onTap} />
-//         <Button title={'4'} onPress={this.onTap} />
-//         <Button title={'5'} onPress={this.onTap} />
-//         <Button title={'6'} onPress={this.onTap} />
-//     </View>);
-//     }
-// };  // End <FirstChoices>
-
-
 export {
     Journeys,
     FirstChoices
