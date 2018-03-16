@@ -1,7 +1,6 @@
+import React, { Component } from 'react';
 import { Constants, Camera, FileSystem, Permissions } from 'expo';
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Slider, Vibration } from 'react-native';
-// import GalleryScreen from './GalleryScreen';
+import { StyleSheet, Text, View, TouchableOpacity, Vibration } from 'react-native';
 // import isIPhoneX from 'react-native-is-iphonex';
 const isIPhoneX = true;
 
@@ -27,7 +26,7 @@ const CamButton = function ({ onPress, text, flex, align, extraStyles }) {
 };  // End <CamButton>
 
 
-export default class JourneyCamera extends React.Component {
+export default class JourneyCamera extends Component {
     state = {
         zoom:       0,
         direction:  'back',
@@ -49,11 +48,6 @@ export default class JourneyCamera extends React.Component {
     toggleFacing () {
         var direction = this.state.direction === 'back' ? 'front' : 'back';
         this.setState({ direction: direction });
-    }
-
-    toggleFocus () {
-        var autoFocus = this.state.autoFocus === 'on' ? 'off' : 'on';
-        this.setState({ autoFocus: autoFocus });
     }
 
     zoomOut () {
@@ -115,7 +109,7 @@ export default class JourneyCamera extends React.Component {
                     <CamButton onPress={this.toggleFacing.bind(this)} text={' FLIP '} />
                 </View>
                 <View style={{
-                    flex: 0.1,
+                    flex:               0.1,
                     alignSelf:          'flex-end',
                     paddingBottom:      isIPhoneX ? 20 : 0,
                     backgroundColor:    'transparent',
@@ -146,9 +140,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#000',
     },
-    navigation: {
-        flex: 1,
-    },
+    navigation: { flex: 1, },
     flipButton: {
         flex: 0.3,
         height: 40,
@@ -166,9 +158,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 15,
     },
-    picButton: {
-        backgroundColor: 'darkseagreen',
-    },
+    picButton: { backgroundColor: 'darkseagreen', },
 });
 
 
