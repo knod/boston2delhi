@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Constants, Camera, FileSystem, Permissions } from 'expo';
-import { StyleSheet, Text, View, TouchableOpacity, Vibration } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Vibration, CameraRoll } from 'react-native';
 // import isIPhoneX from 'react-native-is-iphonex';
 const isIPhoneX = true;
 
 
-const CamButton = function ({ onPress, text, flex, align, extraStyles }) {
+const CamButton = function ({ onPress, content, flex, align, extraStyles }) {
 
     extraStyles = extraStyles || {};
 
@@ -19,7 +19,7 @@ const CamButton = function ({ onPress, text, flex, align, extraStyles }) {
             style   = {[styles.flipButton, extraStyles, alignSelf, {flex: flex} ]}
             onPress = { onPress } >
 
-            <Text style={styles.flipText}> { text } </Text>
+            <Text style={styles.flipText}> { content } </Text>
 
         </TouchableOpacity>
     );
@@ -28,21 +28,48 @@ const CamButton = function ({ onPress, text, flex, align, extraStyles }) {
 
 export default class JourneyCamera extends Component {
     state = {
+        recording:  false,
         zoom:       0,
         direction:  'back',
-        photoId:    1,
-        permissionsGranted: false,
+        vidId:      1,
+        hasPermission: false,
     };
 
+    async getVisualPermissions () {
+        var { status } = await Permissions.askAsync( Permissions.CAMERA );
+        return status === 'granted';
+    }
+
+    async getAudioPermissions () {
+        var { status } = await Permissions.askAsync( Permissions.AUDIO_RECORDING );
+        return status === 'granted';
+    }
+
+    async getRollPermissions () {
+        var { status } = await Permissions.askAsync( Permissions.CAMERA_ROLL );
+        return status === 'granted';
+    }
+
     async componentWillMount () {
-        const { status } = await Permissions.askAsync(Permissions.CAMERA);
-        this.setState({ permissionsGranted: status === 'granted' });
+        var canImage = await this.getVisualPermissions(),
+            canAudio = await this.getAudioPermissions(),
+            canSave  = await this.getRollPermissions();
+        this.setState({ hasPermission: canImage && canAudio && canSave });
     }
 
     componentDidMount () {
-        FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'Journeys').catch(e => {
-            console.log(e, 'Directory exists');
-        });
+        // Make sure we can save files? Not sure how to access them on iOS.
+        // FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'Journeys').catch(e => {
+        //     console.log(e, 'Directory exists');
+        // });
+    }
+
+    componentWillUnmount () {
+        // Stop the recording camera if the app is being exited unexpectedly
+        if (this.camera && this.state.recording) {
+            this.camera.stopRecording();
+            this.setState({ recording: false });
+        }
     }
 
     toggleFacing () {
@@ -60,20 +87,48 @@ export default class JourneyCamera extends Component {
         this.setState({ zoom: zoom });
     }
 
-    takePicture = async function() {
+    record = async function () {
+        /** @todo Do we want to set a maxFileSize? */
         if (this.camera) {
-            this.camera.takePictureAsync().then(data => {
-                FileSystem.moveAsync({
-                    from: data.uri,
-                    to: `${FileSystem.documentDirectory}Journeys/Photo_${this.state.photoId}.jpg`,
-                }).then(() => {
-                    var ID = this.state.photoId + 1
-                    this.setState({ photoId: ID });
+            this.camera.recordAsync()
+            // // Don't save till we know a little bit more about where it's being stored
+            // .then(data => {
+            //     FileSystem.moveAsync({
+            //         from: data.uri,
+            //         to: `${FileSystem.documentDirectory}Journeys/Video_${this.state.vidId}.jpg`,
+            //     })
+                .then(() => {
+                    /** @todo Save id to permanent storage so it won't be repeated next time app opens */
+                    var ID = this.state.vidId + 1
+                    this.setState({ vidId: ID, debug: `${FileSystem.documentDirectory}Journeys/Video_${this.state.vidId}.jpg` });
                     Vibration.vibrate();
                 });
-            });
+            // });
+
+            this.setState({ recording: true });
         }
-    };
+    }
+
+    stopRecording = async () => {
+        if (this.camera) {
+            this.camera.stopRecording();
+            this.setState({ recording: false });
+        }
+    }
+
+    renderRecordingButton ( isRecording ) {
+        if ( isRecording ) {
+            return (
+                <CamButton align={'end'} flex={1} onPress={this.stopRecording.bind(this)} content={'X'}
+                    extraStyles={styles.stopButton} />
+            );
+        } else {
+            return (
+                <CamButton align={'end'} flex={1} onPress={this.record.bind(this)} content={'O'}
+                    extraStyles={styles.recordButton} />
+            );
+        }
+    }
 
     renderNoPermissions () {
         return (
@@ -87,11 +142,15 @@ export default class JourneyCamera extends Component {
 
     renderCamera () {
         var {
+            debug,
+            recording,
             zoom,
             direction,
-            photoId,
-            permissionsGranted,
+            vidId,
+            hasPermission,
         } = this.state;
+
+        var recordingContent = this.renderRecordingButton( recording );
 
         return (
             <Camera
@@ -100,14 +159,16 @@ export default class JourneyCamera extends Component {
                 type    = {direction}
                 zoom    = {zoom}>
                 <View style={{
-                    flex:               0.5,
+                    flex:               1,
+                    width:              300,
                     justifyContent:     'space-around',
                     paddingTop:         Constants.statusBarHeight / 2,
                     backgroundColor:    'transparent',
                     flexDirection:      'row',
                 }}>
-                    <CamButton onPress={this.toggleFacing.bind(this)} text={' FLIP '} />
+                    <CamButton onPress={this.toggleFacing.bind(this)} content={' FLIP '} />
                 </View>
+                <Text style={{backgroundColor: 'white'}}>{debug}</Text>
                 <View style={{
                     flex:               0.1,
                     alignSelf:          'flex-end',
@@ -115,10 +176,9 @@ export default class JourneyCamera extends Component {
                     backgroundColor:    'transparent',
                     flexDirection:      'row',
                 }}>
-                    <CamButton align={'end'} flex={0.1} onPress={this.zoomIn.bind(this)} text={' + '} />
-                    <CamButton align={'end'} flex={0.1} onPress={this.zoomOut.bind(this)} text={' - '} />
-                    <CamButton align={'end'} flex={0.3} onPress={this.takePicture.bind(this)} text={' SNAP '}
-                        extraStyles={styles.picButton} />
+                    <CamButton align={'end'} flex={0.1} onPress={this.zoomIn.bind(this)} content={' + '} />
+                    <CamButton align={'end'} flex={0.1} onPress={this.zoomOut.bind(this)} content={' - '} />
+                    <View style={{ flex: 0.3, flexDirection: 'row', }}>{ recordingContent }</View>
                 </View>
             </Camera>
         );
@@ -126,7 +186,7 @@ export default class JourneyCamera extends Component {
 
 
     render () {
-        const cameraScreenContent = this.state.permissionsGranted
+        const cameraScreenContent = this.state.hasPermission
             ? this.renderCamera()
             : this.renderNoPermissions();
         const content = cameraScreenContent;
@@ -158,7 +218,8 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 15,
     },
-    picButton: { backgroundColor: 'darkseagreen', },
+    recordButton: { backgroundColor: 'darkseagreen', },
+    stopButton: { backgroundColor: 'red' }
 });
 
 
