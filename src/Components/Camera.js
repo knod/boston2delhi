@@ -103,7 +103,6 @@ export default class JourneyCamera extends Component {
                         uris    = {...this.state.vidURIs}
                     uris[ ID ]  = uri;
 
-                    Vibration.vibrate();
                     this.setState({ vidId: ID, vidURIs: uris, debug: uri });
 
                 });
@@ -116,7 +115,6 @@ export default class JourneyCamera extends Component {
 
     stopRecording = () => {
         // Can't vibrate in here
-        Vibration.vibrate()
         if (this.camera) {
             this.camera.stopRecording();
             this.setState({ recording: false });
