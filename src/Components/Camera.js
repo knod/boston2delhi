@@ -32,6 +32,7 @@ export default class JourneyCamera extends Component {
         zoom:       0,
         direction:  'back',
         vidId:      1,
+        vidURIs:    {},
         hasPermission: false,
     };
 
@@ -87,29 +88,33 @@ export default class JourneyCamera extends Component {
         this.setState({ zoom: zoom });
     }
 
-    record = async function () {
+    record = async () => {
         /** @todo Do we want to set a maxFileSize? */
         if (this.camera) {
-            this.camera.recordAsync()
-            // // Don't save till we know a little bit more about where it's being stored
-            // .then(data => {
-            //     FileSystem.moveAsync({
-            //         from: data.uri,
-            //         to: `${FileSystem.documentDirectory}Journeys/Video_${this.state.vidId}.jpg`,
-            //     })
-                .then(() => {
-                    /** @todo Save id to permanent storage so it won't be repeated next time app opens */
-                    var ID = this.state.vidId + 1
-                    this.setState({ vidId: ID, debug: `${FileSystem.documentDirectory}Journeys/Video_${this.state.vidId}.jpg` });
-                    Vibration.vibrate();
+
+            this.camera.recordAsync().then(( data ) => {
+
+                // Can't vibrate as soon as we get in here
+
+                CameraRoll.saveToCameraRoll( data.uri ).then(( uri ) => {
+
+                    /** @todo Save vid IDs and vid ID to permanent storage so we can fetch them in the future */
+                    var ID      = this.state.vidId + 1,
+                        uris    = {...this.state.vidURIs}
+                    uris[ ID ]  = uri;
+
+                    this.setState({ vidId: ID, vidURIs: uris, debug: uri });
+
                 });
-            // });
+
+            });
 
             this.setState({ recording: true });
         }
     }
 
-    stopRecording = async () => {
+    stopRecording = () => {
+        // Can't vibrate in here
         if (this.camera) {
             this.camera.stopRecording();
             this.setState({ recording: false });
@@ -119,7 +124,7 @@ export default class JourneyCamera extends Component {
     renderRecordingButton ( isRecording ) {
         if ( isRecording ) {
             return (
-                <CamButton align={'end'} flex={1} onPress={this.stopRecording.bind(this)} content={'X'}
+                <CamButton align={'end'} flex={1} onPress={this.stopRecording} content={'X'}
                     extraStyles={styles.stopButton} />
             );
         } else {
@@ -128,7 +133,7 @@ export default class JourneyCamera extends Component {
                     extraStyles={styles.recordButton} />
             );
         }
-    }
+    } 
 
     renderNoPermissions () {
         return (
