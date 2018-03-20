@@ -1,46 +1,45 @@
 import React, { Component } from 'react';
-import { WebView, Button, Dimensions, View, Text } from 'react-native';
+import { Constants } from 'expo';
+import { WebView, Dimensions, View, Text, TouchableOpacity } from 'react-native';
 
-// CUSTOM
+// FUNCTIONAL
 import { JourneyCamera } from '../Components/Camera';
 
+// PRESENTATION
+import { FlexButton } from '../Components/FlexButton';
 
-class Choices extends Component {
+
+class EndOfVideo extends Component {
     state = { next: null }
 
     onCamera = ( evnt ) => {
         this.setState({ next: 'camera' });
     };
 
-    render () {
+    onObjects = ( evnt ) => {}
 
-        var {height, width} = Dimensions.get('window'),
-            halfHeight      = height/2,
-            halfWidth       = width/2,
-            style           = {
-                height: height,
-                width: width,
-                // position: 'absolute',
-                // top: -1 * halfHeight,
-                // left: -1 * halfWidth,
-                // display: 'flex',
-                flex: 1,
-                backgroundColor: 'lightblue',
-            }
+    render () {
     
         if ( this.state.next === 'camera' ) {
             // After video, option to take another video?
             return (<JourneyCamera/>);
         } else {
+            // View styling:
+            // Make the buttons not take up the whole screen
+            // Big enough for landscape, not too big for portrait
             return (
-                <View style={style}>
-                    <Button title={'Button for camera (placeholder)'} name='camera' onPress={this.onCamera} />
-                    <Button title={'Button for objects (placeholder)'} name='objects' onPress={function(){}}/>
+                <View style={{ flex: 0.4, }}>
+                    <FlexButton onPress={this.onCamera} extraStyles={styles.button}>
+                        Button for camera (placeholder)
+                    </FlexButton>
+                    <FlexButton onPress={this.onObjects} extraStyles={styles.button}>
+                        Button for objects (placeholder)
+                    </FlexButton>
                 </View>
             );
         }
     }  // End render()
-};  // End <Choices>
+};  // End <EndOfVideo>
 
 
 class JourneyManager extends Component {
@@ -62,13 +61,27 @@ class JourneyManager extends Component {
     //     decelerationRate="normal"
     //     style={{ width: 200, height: 20 }}  />
 
+    // In future, put video in here until it ends.
     return (
-        <View style={{ flex: 1 }}>
-            <Choices/>
+        <View style={[ styles.manager, { marginTop: Constants.statusBarHeight } ]}>
+            <EndOfVideo/>
         </View>
     );
   }
-}
+};  // End <JourneyManager>
+
+
+var styles = {
+    manager: {
+        flex: 1,
+        alignContent: 'center',
+        justifyContent: 'center',
+        // Margin around outer edges
+        margin: 20,
+    },
+    button: { margin: 5, }
+};  // end styles
+
 
 export {
     JourneyManager

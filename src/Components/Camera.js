@@ -2,21 +2,8 @@ import React, { Component } from 'react';
 import { Constants, Camera, Permissions } from 'expo';
 import { StyleSheet, Text, View, TouchableOpacity, CameraRoll } from 'react-native';
 
-
-const CamButton = function ({ onPress, content, extraStyles }) {
-
-    extraStyles = extraStyles || {};
-
-    return (
-        <TouchableOpacity
-            style   = {[styles.cameraButton, extraStyles ]}
-            onPress = { onPress } >
-
-            <Text style={styles.buttonText}> { content } </Text>
-
-        </TouchableOpacity>
-    );
-};  // End <CamButton>
+// PRESENTATION
+import { FlexButton } from './FlexButton';
 
 
 export default class JourneyCamera extends Component {
@@ -85,7 +72,7 @@ export default class JourneyCamera extends Component {
         this.setState({ zoom: zoom });
     }
 
-    record = async () => {
+    record = () => {
         /** @todo Do we want to set a maxFileSize? */
         if (this.camera) {
 
@@ -115,13 +102,15 @@ export default class JourneyCamera extends Component {
     renderRecordingButton ( isRecording ) {
         if ( isRecording ) {
             return (
-                <CamButton align={'end'} onPress={this.stopRecording} content={'X'}
-                    extraStyles={styles.stopButton} />
+                <FlexButton onPress={this.stopRecording} extraStyles={styles.stopButton}>
+                    {'X'}
+                </FlexButton>
             );
         } else {
             return (
-                <CamButton align={'end'} onPress={this.record.bind(this)} content={'O'}
-                    extraStyles={styles.recordButton} />
+                <FlexButton onPress={this.record} extraStyles={styles.stopButton}>
+                    {'O'}
+                </FlexButton>
             );
         }
     } 
@@ -163,7 +152,7 @@ export default class JourneyCamera extends Component {
         return (
             <Camera
                 ref     = {ref => { this.camera = ref; }}
-                style   = {[ styles.camera, {paddingTop: Constants.statusBarHeight + 5} ]}
+                style   = {[ styles.camera, {paddingTop: Constants.statusBarHeight} ]}
                 type    = {direction}
                 zoom    = {zoom}>
                 <View style={{
@@ -172,12 +161,12 @@ export default class JourneyCamera extends Component {
                     marginLeft:    100,
                     marginRight:   100,
                 }}>
-                    <CamButton onPress={this.toggleFacing.bind(this)} content={' FLIP '} />
+                    <FlexButton onPress={this.toggleFacing.bind(this)}>{'FLIP'}</FlexButton>
                 </View>
                 <View style={styles.bottomRow}>
                     <View style={styles.bottomRowGroup}>
-                        <CamButton align={'end'} onPress={this.zoomIn.bind(this)} content={' + '} />
-                        <CamButton align={'end'} onPress={this.zoomOut.bind(this)} content={' - '} />
+                        <FlexButton onPress={this.zoomIn.bind(this)}>{'+'}</FlexButton>
+                        <FlexButton onPress={this.zoomOut.bind(this)}>{'-'}</FlexButton>
                     </View>
                     <View style={styles.bottomRowGroup}>{ recordingContent }</View>
                     <View style={styles.bottomRowGroup}></View>
@@ -218,19 +207,6 @@ const styles = StyleSheet.create({
         alignItems:     'center',
         justifyContent: 'center',
     },
-    cameraButton: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 3,
-        borderRadius: 8,
-        borderColor: 'white',
-        borderWidth: 1,
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 15,
-    },
     recordButton: { backgroundColor: 'darkseagreen', },
     stopButton: { backgroundColor: 'tomato' }
 });  // End styles
@@ -238,5 +214,4 @@ const styles = StyleSheet.create({
 
 export {
     JourneyCamera,
-    CamButton,
 };
