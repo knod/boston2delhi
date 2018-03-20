@@ -1,25 +1,18 @@
 import React, { Component } from 'react';
 import { Constants, Camera, FileSystem, Permissions } from 'expo';
 import { StyleSheet, Text, View, TouchableOpacity, Vibration, CameraRoll } from 'react-native';
-// import isIPhoneX from 'react-native-is-iphonex';
-const isIPhoneX = true;
 
 
-const CamButton = function ({ onPress, content, flex, align, extraStyles }) {
+const CamButton = function ({ onPress, content, extraStyles }) {
 
     extraStyles = extraStyles || {};
 
-    var alignSelf   = {},
-        defaultFlex = 1;
-    if ( align ) { alignSelf = {alignSelf: 'flex-' + align}  }
-    if ( flex === undefined ) { flex = defaultFlex }
-
     return (
         <TouchableOpacity
-            style   = {[styles.flipButton, extraStyles, alignSelf, {flex: flex} ]}
+            style   = {[styles.cameraButton, extraStyles ]}
             onPress = { onPress } >
 
-            <Text style={styles.flipText}> { content } </Text>
+            <Text style={styles.buttonText}> { content } </Text>
 
         </TouchableOpacity>
     );
@@ -33,6 +26,7 @@ export default class JourneyCamera extends Component {
         direction:  'back',
         vidId:      1,
         vidURIs:    {},
+        notGranted: [],
         hasPermission: false,
     };
 
@@ -52,10 +46,20 @@ export default class JourneyCamera extends Component {
     }
 
     async componentWillMount () {
+
+        var notGranted = [];
         var canImage = await this.getVisualPermissions(),
             canAudio = await this.getAudioPermissions(),
             canSave  = await this.getRollPermissions();
-        this.setState({ hasPermission: canImage && canAudio && canSave });
+
+        if ( !canImage ) { notGranted.push( 'video' ) }
+        if ( !canAudio ) { notGranted.push( 'sound' ) }
+        if ( !canSave ) { notGranted.push( 'video saving' ) }
+
+        this.setState({
+            hasPermission: canImage && canAudio && canSave,
+            notGranted: notGranted
+        });
     }
 
     componentDidMount () {
@@ -93,20 +97,14 @@ export default class JourneyCamera extends Component {
         if (this.camera) {
 
             this.camera.recordAsync().then(( data ) => {
-
                 // Can't vibrate as soon as we get in here
-
                 CameraRoll.saveToCameraRoll( data.uri ).then(( uri ) => {
-
                     /** @todo Save vid IDs and vid ID to permanent storage so we can fetch them in the future */
                     var ID      = this.state.vidId + 1,
                         uris    = {...this.state.vidURIs}
                     uris[ ID ]  = uri;
-
                     this.setState({ vidId: ID, vidURIs: uris, debug: uri });
-
                 });
-
             });
 
             this.setState({ recording: true });
@@ -124,24 +122,33 @@ export default class JourneyCamera extends Component {
     renderRecordingButton ( isRecording ) {
         if ( isRecording ) {
             return (
-                <CamButton align={'end'} flex={1} onPress={this.stopRecording} content={'X'}
+                <CamButton align={'end'} onPress={this.stopRecording} content={'X'}
                     extraStyles={styles.stopButton} />
             );
         } else {
             return (
-                <CamButton align={'end'} flex={1} onPress={this.record.bind(this)} content={'O'}
+                <CamButton align={'end'} onPress={this.record.bind(this)} content={'O'}
                     extraStyles={styles.recordButton} />
             );
         }
     } 
 
     renderNoPermissions () {
+        var notGranted  = this.state.notGranted,
+            length      = notGranted.length,
+            kinds       = '';
+        if ( length > 1 ) {
+            notGranted[ length - 1 ] = 'and ' + notGranted[ length - 1 ];
+        }
+        if ( length > 2 ) { kinds = notGranted.join(', '); }
+        else { kinds = notGranted.join(' '); }
+
+        var message = 'Permissions for ' + kinds + ' have not been granted - cannot open camera preview.';
+
         return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10 }}>
-            <Text style={{ color: 'white' }}>
-                Camera permissions not granted - cannot open camera preview.
-            </Text>
-        </View>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10 }}>
+                <Text style={{ color: 'white' }}>{ message }</Text>
+            </View>
         );
     }
 
@@ -157,33 +164,30 @@ export default class JourneyCamera extends Component {
 
         var recordingContent = this.renderRecordingButton( recording );
 
+        // Add this when some debugging is needed
+        // <Text style={{backgroundColor: 'white'}}>{debug}</Text>
+
         return (
             <Camera
                 ref     = {ref => { this.camera = ref; }}
-                style   = {{ flex: 1, }}
+                style   = {[ styles.camera, {paddingTop: Constants.statusBarHeight + 5} ]}
                 type    = {direction}
                 zoom    = {zoom}>
                 <View style={{
-                    flex:               1,
-                    width:              300,
                     justifyContent:     'space-around',
-                    paddingTop:         Constants.statusBarHeight / 2,
-                    backgroundColor:    'transparent',
                     flexDirection:      'row',
+                    marginLeft:    100,
+                    marginRight:   100,
                 }}>
                     <CamButton onPress={this.toggleFacing.bind(this)} content={' FLIP '} />
                 </View>
-                <Text style={{backgroundColor: 'white'}}>{debug}</Text>
-                <View style={{
-                    flex:               0.1,
-                    alignSelf:          'flex-end',
-                    paddingBottom:      isIPhoneX ? 20 : 0,
-                    backgroundColor:    'transparent',
-                    flexDirection:      'row',
-                }}>
-                    <CamButton align={'end'} flex={0.1} onPress={this.zoomIn.bind(this)} content={' + '} />
-                    <CamButton align={'end'} flex={0.1} onPress={this.zoomOut.bind(this)} content={' - '} />
-                    <View style={{ flex: 0.3, flexDirection: 'row', }}>{ recordingContent }</View>
+                <View style={styles.bottomRow}>
+                    <View style={styles.bottomRowGroup}>
+                        <CamButton align={'end'} onPress={this.zoomIn.bind(this)} content={' + '} />
+                        <CamButton align={'end'} onPress={this.zoomOut.bind(this)} content={' - '} />
+                    </View>
+                    <View style={styles.bottomRowGroup}>{ recordingContent }</View>
+                    <View style={styles.bottomRowGroup}></View>
                 </View>
             </Camera>
         );
@@ -203,29 +207,40 @@ export default class JourneyCamera extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        alignContent: 'space-between',
+        backgroundColor:    'transparent',
     },
-    navigation: { flex: 1, },
-    flipButton: {
-        flex: 0.3,
-        height: 40,
-        marginHorizontal: 2,
-        marginBottom: 10,
-        marginTop: 20,
+    camera: {
+        flex: 1,
+        justifyContent: 'space-between',
+    },
+    bottomRow: {
+        margin:  20,
+        flexDirection:  'row',
+        justifyContent: 'space-between'
+    },
+    bottomRowGroup: {
+        flex:           0.3,
+        flexDirection:  'row',
+        alignItems:     'center',
+        justifyContent: 'center',
+    },
+    cameraButton: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 3,
         borderRadius: 8,
         borderColor: 'white',
         borderWidth: 1,
-        padding: 5,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
-    flipText: {
+    buttonText: {
         color: 'white',
         fontSize: 15,
     },
     recordButton: { backgroundColor: 'darkseagreen', },
-    stopButton: { backgroundColor: 'red' }
-});
+    stopButton: { backgroundColor: 'tomato' }
+});  // End styles
 
 
 export {

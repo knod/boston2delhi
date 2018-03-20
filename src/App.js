@@ -9,7 +9,7 @@ export default class App extends React.Component {
   render() {
     return (
       <View id={'webRoot'} style={styles.container}>
-        <Journeys style={{flex: 1}}/>
+        <Journeys/>
       </View>
     );
   }
@@ -18,8 +18,6 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
   },
 });

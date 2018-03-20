@@ -30,7 +30,7 @@ class Choices extends Component {
     
         if ( this.state.next === 'camera' ) {
             // After video, option to take another video?
-            return (<JourneyCamera />);
+            return (<JourneyCamera/>);
         } else {
             return (
                 <View style={style}>
@@ -63,7 +63,7 @@ class JourneyManager extends Component {
     //     style={{ width: 200, height: 20 }}  />
 
     return (
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
             <Choices/>
         </View>
     );

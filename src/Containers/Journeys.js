@@ -21,9 +21,9 @@ class Journeys extends Component {
 
         var onTap = this.onTap;
         if ( this.state.which === 'journey' ) {
-            return <JourneyManager path={'something'} style={{ flex: 1 }} />
+            return <JourneyManager path={'something'} />
         } else {
-            return <FirstChoices onTap={onTap} style={{ flex: 1 }} />
+            return <FirstChoices onTap={onTap} />
         }
 
     }
