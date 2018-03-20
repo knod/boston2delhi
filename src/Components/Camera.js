@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Constants, Camera, FileSystem, Permissions } from 'expo';
-import { StyleSheet, Text, View, TouchableOpacity, Vibration, CameraRoll } from 'react-native';
+import { Constants, Camera, Permissions } from 'expo';
+import { StyleSheet, Text, View, TouchableOpacity, CameraRoll } from 'react-native';
 
 
 const CamButton = function ({ onPress, content, extraStyles }) {
@@ -60,13 +60,6 @@ export default class JourneyCamera extends Component {
             hasPermission: canImage && canAudio && canSave,
             notGranted: notGranted
         });
-    }
-
-    componentDidMount () {
-        // Make sure we can save files? Not sure how to access them on iOS.
-        // FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'Journeys').catch(e => {
-        //     console.log(e, 'Directory exists');
-        // });
     }
 
     componentWillUnmount () {
