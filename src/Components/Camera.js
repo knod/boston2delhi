@@ -156,10 +156,10 @@ export default class JourneyCamera extends Component {
                 type    = {direction}
                 zoom    = {zoom}>
                 <View style={{
-                    justifyContent:     'space-around',
-                    flexDirection:      'row',
-                    marginLeft:    100,
-                    marginRight:   100,
+                    justifyContent: 'space-around',
+                    flexDirection:  'row',
+                    marginLeft:     100,
+                    marginRight:    100,
                 }}>
                     <FlexButton onPress={this.toggleFacing.bind(this)}>{'FLIP'}</FlexButton>
                 </View>
@@ -169,7 +169,9 @@ export default class JourneyCamera extends Component {
                         <FlexButton onPress={this.zoomOut.bind(this)}>{'-'}</FlexButton>
                     </View>
                     <View style={styles.bottomRowGroup}>{ recordingContent }</View>
-                    <View style={styles.bottomRowGroup}></View>
+                    <View style={styles.bottomRowGroup}>
+                        <FlexButton onPress={this.props.onCancel}>{'Cancel'}</FlexButton>
+                    </View>
                 </View>
             </Camera>
         );
@@ -208,7 +210,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     recordButton: { backgroundColor: 'darkseagreen', },
-    stopButton: { backgroundColor: 'tomato' }
+    stopButton: { backgroundColor: 'tomato' },
+    cancelButton: { color: 'tomato', borderColor: 'tomato'}
 });  // End styles
 
 
