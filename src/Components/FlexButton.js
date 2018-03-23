@@ -3,16 +3,17 @@ import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 
 
-const FlexButton = function ({ extraStyles, onPress, children }) {
+const FlexButton = function ({ extraStyles, textStyles, onPress, children }) {
 
     extraStyles = extraStyles || {};
+    textStyles = textStyles || {};
 
     return (
         <TouchableOpacity
-            style   = {[styles.button, extraStyles ]}
+            style   = {[ styles.button, extraStyles ]}
             onPress = { onPress } >
 
-            <Text style={styles.buttonText}> { children } </Text>
+            <Text style={[ styles.buttonText, textStyles ]}> { children } </Text>
 
         </TouchableOpacity>
     );

@@ -108,7 +108,7 @@ export default class JourneyCamera extends Component {
             );
         } else {
             return (
-                <FlexButton onPress={this.record} extraStyles={styles.stopButton}>
+                <FlexButton onPress={this.record} extraStyles={styles.recordButton}>
                     {'O'}
                 </FlexButton>
             );
@@ -170,7 +170,7 @@ export default class JourneyCamera extends Component {
                     </View>
                     <View style={styles.bottomRowGroup}>{ recordingContent }</View>
                     <View style={styles.bottomRowGroup}>
-                        <FlexButton onPress={this.props.onCancel}>{'Cancel'}</FlexButton>
+                        <FlexButton onPress={this.props.onCancel} extraStyles={styles.cancelButton} textStyles={styles.cancleText}>{'Cancel'}</FlexButton>
                     </View>
                 </View>
             </Camera>
@@ -211,7 +211,8 @@ const styles = StyleSheet.create({
     },
     recordButton: { backgroundColor: 'darkseagreen', },
     stopButton: { backgroundColor: 'tomato' },
-    cancelButton: { color: 'tomato', borderColor: 'tomato'}
+    cancelButton: { borderColor: 'tomato' },
+    cancleText: { color: 'black', },
 });  // End styles
 
 
