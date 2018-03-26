@@ -10,30 +10,34 @@ import { Camera } from '../Components/Camera';
 
 
 class Journeys extends Component {
-    state = {which: 'choices'}
+    state = {which: 'objects'}
 
-    onTap = (evnt, action) => {
-        if ( action === 'goToJourney' ) { this.setState({which: 'journey'}) }
-        else { this.setState({which: 'choices'}) }
+    onTap = ( evnt, action ) => {
+        if ( action === 'goToJourney' ) { this.setState({which: 'journey'}); }
+        else { this.setState({which: 'objects'}); }
+    }
+
+    onBack = (evnt) => {
+        this.setState({which: 'objects'});
     }
 
     render () {
 
         var onTap = this.onTap;
         if ( this.state.which === 'journey' ) {
-            return <JourneyManager path={'something'} />
+            return <JourneyManager path={'something'} onBack={this.onBack}/>
         } else {
-            return <FirstChoices onTap={onTap} />
+            return <Objects onTap={onTap} />
         }
 
     }
 };  // End <Journeys>
 
 
-const FirstChoices = function ({ onTap }) {
+const Objects = function ({ onTap }) {
 
     var myTap = (evnt) => {
-        onTap(evnt, 'goToJourney');
+        onTap( evnt, 'goToJourney' );
     }
 
     return (<View className={'opening-choice'} centered size={'mini'}>
@@ -44,10 +48,10 @@ const FirstChoices = function ({ onTap }) {
         <Button title={'5'} onPress={myTap} />
         <Button title={'6'} onPress={myTap} />
     </View>);
-};  // End <FirstChoices>
+};  // End <Objects>
 
 
 export {
     Journeys,
-    FirstChoices
+    Objects
 };
