@@ -58,7 +58,7 @@ class JourneyManager extends Component {
                 </View>
             );
         } else if ( stage === 'camera' ) {
-            return (<JourneyCamera onCancel={this.onCancelCamera} onStop={this.onCancel} />);
+            return (<JourneyCamera onCancel={this.onCancelCamera} onStop={this.onCancel} StyledButton={FlexButton} />);
         } else {
             // This shouldn't happen
             return null;
