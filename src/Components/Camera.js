@@ -120,10 +120,9 @@ export default class JourneyCamera extends Component {
     } 
 
     renderNoPermissions = () => {
-        var { StyledButton }    = this.props,
-            notGranted          = this.state.notGranted,
-            length              = notGranted.length,
-            kinds               = '';
+        var notGranted  = this.state.notGranted,
+            length      = notGranted.length,
+            kinds       = '';
 
         if ( length > 1 ) {
             notGranted[ length - 1 ] = 'and ' + notGranted[ length - 1 ];
