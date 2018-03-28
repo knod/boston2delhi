@@ -1,7 +1,6 @@
 // Page for users to select journeys
 
 import React, { Component } from 'react';
-import { Transition, Image } from 'semantic-ui-react';
 import { Button, View } from 'react-native';
 
 // OURS

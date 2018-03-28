@@ -34,7 +34,6 @@
     "react-dom": "^16.2.0",
     "react-native": "0.50.3",
     "react-native-camera": "^1.0.2",
-    "react-native-web": "^0.1.16",
-    "semantic-ui-react": "^0.78.3"
+    "react-native-web": "^0.1.16"
   }
 }
