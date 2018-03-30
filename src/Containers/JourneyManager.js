@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet, } from 'react-native';
 
 // FUNCTIONAL
 import { JourneyCamera } from '../Components/Camera';
+import { CameraOverlay } from '../Components/CameraOverlay';
 
 // PRESENTATION
 import { FlexButton } from '../Components/FlexButton';
@@ -11,13 +12,9 @@ import { FlexButton } from '../Components/FlexButton';
 class AfterVideoOver extends Component {
     state = { next: null }
 
-    onCamera = ( evnt ) => { this.onChoose( 'camera' ) };
+    onCamera = ( evnt ) => { this.props.onChoose( 'camera' ) }
 
-    onOther = ( evnt ) => { this.onChoose( 'objects' ) }
-
-    onChoose = ( choice ) => {
-        this.props.onChoose( choice );
-    }
+    onOther = ( evnt ) => { this.props.onChoose( 'objects' ) }
 
     render () {
         return (
@@ -36,7 +33,7 @@ class AfterVideoOver extends Component {
 
 class JourneyManager extends Component {
 
-    state = { stage: 'videOver' }
+    state = { stage: 'vidOver' }
 
     onCancelCamera = () => { this.props.onBack(); }
 
@@ -51,14 +48,20 @@ class JourneyManager extends Component {
     render () {
         var stage = this.state.stage;
 
-        if ( stage === 'videOver' ) {
+        if ( stage === 'vidOver' ) {
             return (
                 <View style={styles.manager}>
                     <AfterVideoOver onChoose={this.onChoose} />
                 </View>
             );
         } else if ( stage === 'camera' ) {
-            return (<JourneyCamera onCancel={this.onCancelCamera} onStop={this.onCancel} StyledButton={FlexButton} />);
+            return (
+                <JourneyCamera
+                    onCancel    = { this.onCancelCamera }
+                    onStop      = { this.onCancel }
+                    StyledButton= { FlexButton }
+                    Overlay     = { CameraOverlay } />
+            );
         } else {
             // This shouldn't happen
             return null;
@@ -67,23 +70,23 @@ class JourneyManager extends Component {
 };  // End <JourneyManager>
 
 
-var styles = {
+var styles = StyleSheet.create({
     manager: {
-        flex: 1,
-        alignContent: 'center',
+        flex:           1,
+        alignContent:   'center',
         justifyContent: 'center',
     },
     choices: {
         flex: 1,
-        alignContent: 'center',
+        alignContent:   'center',
         justifyContent: 'center',
         // Margin around outer edges
-        padding: 20,
+        padding:        20,
     },
     // Make the buttons not take up the whole screen
     // Big enough for landscape, not too big for portrait
     button: { margin: 5, flex: 0.2 }
-};  // end styles
+});  // end styles
 
 
 export {
