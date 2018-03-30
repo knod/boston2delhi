@@ -59,7 +59,6 @@ class JourneyManager extends Component {
                 <JourneyCamera
                     onCancel    = { this.onCancelCamera }
                     onStop      = { this.onCancel }
-                    StyledButton= { FlexButton }
                     Overlay     = { CameraOverlay } />
             );
         } else {
